@@ -9,9 +9,12 @@ import torch.utils.data
 from torch import nn
 import torchvision
 from torchvision import transforms
+from PIL import ImageFile
 import torch.nn.functional as F
 
-import utils
+
+#import utils
+
 
 
 def train_one_epoch(model, criterion, optimizer, data_loader, epoch, val_dataloader, classes):
@@ -116,9 +119,8 @@ def evaluate(model, criterion, data_loader, epoch, step):
 def main(args):
     print("Loading data")
     traindir = os.path.join(args.data_dir, 'train')
-    valdir = os.path.join(args.data_dir, 'val')
+    valdir = os.path.join(args.data_dir, 'test')
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-
     print("Loading training data")
     st = time.time()
     # need data augumentation
@@ -171,6 +173,7 @@ def main(args):
     #print(model)
 
     # support muti gpu
+
     model = nn.DataParallel(model, device_ids=args.device)
     model.cuda()
 
@@ -187,7 +190,7 @@ def main(args):
         lr_scheduler.load_state_dict(checkpoint['lr_scheduler'])
 
     if args.test_only:
-        evaluate(model, criterion, data_loader_test)
+        evaluate(model, criterion, val_dataloader)
         return
 
     print("Start training")
@@ -205,10 +208,10 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='PyTorch Classification Training')
 
-    parser.add_argument('--data-dir', default='/data/user/yangfg/corpus/kar-data', help='dataset')
+    parser.add_argument('--data-dir', default='/home/sehat/dataset', help='dataset')
     parser.add_argument('--model', default='resnet101', help='model')
     parser.add_argument('--device', default=[0], help='device')
-    parser.add_argument('-b', '--batch-size', default=512, type=int)
+    parser.add_argument('-b', '--batch-size', default=32, type=int)
     parser.add_argument('--epochs', default=90, type=int, metavar='N',
                         help='number of total epochs to run')
     parser.add_argument('-j', '--workers', default=16, type=int, metavar='N',
@@ -237,6 +240,7 @@ if __name__ == "__main__":
         os.mkdir(args.checkpoints)
 
     g_val_accs = {}
+    ImageFile.LOAD_TRUNCATED_IMAGES = True
 
     print(args)
     main(args)
