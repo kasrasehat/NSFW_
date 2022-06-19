@@ -11,9 +11,10 @@ import torch.utils.data
 from torch import nn
 import torchvision
 from torchvision import transforms
+from PIL import ImageFile
 import torch.nn.functional as F
 
-import utils
+#import utils
 
 from sklearn.metrics import confusion_matrix
 
@@ -79,6 +80,7 @@ def plot_confusion_matrix(cm, classes,
     plt.tight_layout()
 
 def main(args):
+
     testdir = os.path.join(args.data_dir, 'test')
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
@@ -125,15 +127,15 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='PyTorch Classification Training')
 
-    parser.add_argument('--data-dir', default='/data/user/yangfg/corpus/kar-data', help='dataset')
+    parser.add_argument('--data-dir', default='/home/sehat/dataset', help='dataset')
     parser.add_argument('--model', default='resnet101', help='model')
     parser.add_argument('--device', default=[0], help='device')
     parser.add_argument('-b', '--batch-size', default=8, type=int)
     parser.add_argument('-j', '--workers', default=16, type=int, metavar='N',
                         help='number of data loading workers (default: 16)')
-    parser.add_argument('--checkpoint', default='checkpoints/model_68_100.pth', help='checkpoint')
+    parser.add_argument('--checkpoint', default='checkpoints/resnet10_3class_acc91.pth', help='checkpoint')
 
     args = parser.parse_args()
-
+    ImageFile.LOAD_TRUNCATED_IMAGES = True
     print(args)
     main(args)
